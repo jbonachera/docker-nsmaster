@@ -1,0 +1,27 @@
+@ IN SOA ns1.vx-labs.net. hostmaster (423878289 8640 360 60480 10 )
+@                 IN NS           ns1
+@                 IN A            62.210.169.201
+@                 IN MX      1    vx-labs.net.
+
+letsencrypt       IN A            62.210.169.201
+www               IN A            62.210.169.201
+ssh               IN A            62.210.169.201
+
+rspamd            IN CNAME        www
+mailctl           IN CNAME        www
+webmail           IN A		  62.210.169.201
+unifi             IN A      62.210.169.201
+rancher           IN A      62.210.169.201
+
+imap              IN A            62.210.169.201
+
+jabber            IN A            62.210.169.201
+
+smtp              IN A            62.210.169.201
+
+ns1               IN A            62.210.169.201
+
+ts3               IN A            62.210.169.201
+ts                IN CNAME        ts3
+hooks             IN A            62.210.169.201
+chat              IN A            62.210.169.201
