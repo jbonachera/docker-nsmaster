@@ -1,4 +1,4 @@
-@ IN SOA ns1.vx-labs.net. hostmaster (423878289 8640 360 60480 10 )
+@ IN SOA ns1.vx-labs.net. hostmaster (423878291 8640 360 60480 10 )
 @                 IN NS           ns1
 @                 IN NS           mary.nyuu.eu.
 @                 IN A            62.210.169.201
