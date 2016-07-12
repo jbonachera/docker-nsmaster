@@ -19,7 +19,7 @@ RUN pacman -S --noconfirm git make gcc autoconf automake gnutls libcap-ng liburc
     rm -rf /usr/local/src/knot && \
     useradd -r knot && \
     chown -R knot:knot /run/knot /var/lib/knot
-VOLUME /var/lib/knot/kasp
+VOLUME /var/lib/knot/
 ADD knot.conf /etc/knot/knot.conf
 ADD entrypoint /sbin/entrypoint
-ADD zones/* /var/lib/knot/zones/
+ADD zones /etc/knot/zones

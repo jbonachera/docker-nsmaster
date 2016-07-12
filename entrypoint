@@ -6,6 +6,8 @@ ZONES_DNSSEC=${ZONES_DNSSEC:-''}
 TSIG_KEYS=${TSIG_KEYS:-''}
 TSIG_SLAVES=${TSIG_SLAVES:-''}
 
+[[ -d /var/lib/knot/zones/ ]] || mkdir /var/lib/knot/zones/
+
 if [ ! -e /.bootstraped ]; then
   if [ -n "${TSIG_KEYS}" ]; then
     echo -e "key:\n" >> /etc/knot/knot.conf
@@ -29,6 +31,7 @@ if [ ! -e /.bootstraped ]; then
   echo -e "zone:\n" >> /etc/knot/knot.conf
   for zone in ${ZONES}; do
     echo "adding zone $zone"
+    cp /etc/knot/zones/${zone} /var/lib/knot/zones/$zone
     echo -e "  - domain: $zone\n    file: zones/$zone" >> /etc/knot/knot.conf
   done
   
@@ -39,7 +42,8 @@ if [ ! -e /.bootstraped ]; then
     cd -
     for zone in ${ZONES_DNSSEC}; do
       echo "adding signed zone $zone"
-      echo -e "  - domain: $zone\n    dnssec-signing: on\n    file: zones/$zone" >> /etc/knot/knot.conf
+      cp /etc/knot/zones/${zone} /var/lib/knot/zones/$zone
+      echo -e "  - domain: $zone\n    dnssec-signing: on\n    file: /var/lib/knot/zones/$zone\n    disable-any: on" >> /etc/knot/knot.conf
       if [ -n "${TSIG_KEYS}" ]; then
         slaves_var='['
         for slave in ${TSIG_SLAVES}; do
