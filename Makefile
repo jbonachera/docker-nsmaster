@@ -1,2 +1,2 @@
 build:
-	docker build -t docker.io/jbonachera/knot . 
+	docker build -t jbonachera/nsmaster . 
