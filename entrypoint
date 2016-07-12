@@ -18,6 +18,14 @@ if [ ! -e /.bootstraped ]; then
       echo "adding key $key_id"
       echo -e "  - id: key_${key_id}\n    algorithm: ${key_alg}\n    secret: ${key_secret}" >> /etc/knot/knot.conf
     done
+    echo -e "remote:\n" >> /etc/knot/knot.conf
+    for slave in ${TSIG_SLAVES}; do
+      slave_id=$(echo $slave | cut -d : -f 1)
+      slave_ip=$(echo $slave | cut -d : -f 2)
+      slave_keyid=$(echo $slave | cut -d : -f 3)
+      echo "adding remotes for slaves"
+      echo -e "  - id: slave_${slave_id}\n    address: ${slave_ip}@53" >> /etc/knot/knot.conf
+    done
     echo -e "acl:\n" >> /etc/knot/knot.conf
     for slave in ${TSIG_SLAVES}; do
       slave_id=$(echo $slave | cut -d : -f 1)
@@ -43,15 +51,18 @@ if [ ! -e /.bootstraped ]; then
     for zone in ${ZONES_DNSSEC}; do
       echo "adding signed zone $zone"
       cp /etc/knot/zones/${zone} /var/lib/knot/zones/$zone
-      echo -e "  - domain: $zone\n    dnssec-signing: on\n    file: /var/lib/knot/zones/$zone\n    disable-any: on" >> /etc/knot/knot.conf
+      echo -e "  - domain: $zone\n    dnssec-signing: on\n    file: /var/lib/knot/zones/$zone" >> /etc/knot/knot.conf
       if [ -n "${TSIG_KEYS}" ]; then
-        slaves_var='['
+        slaves_var=''
+        remotes_var=''
         for slave in ${TSIG_SLAVES}; do
           slave_id=$(echo $slave | cut -d : -f 1)
           slaves_var="${slaves_var} acl_${slave_id},"
+          remotes_var="${remotes_var} slave_${slave_id},"
         done
-        slaves_var="${slaves_var%?}]"
-        echo "    acl: $slaves_var" >> /etc/knot/knot.conf
+        slaves_var="${slaves_var%?}"
+        remotes_var="${remotes_var%?}"
+        echo -e "    acl: [$slaves_var]\n    notify: [$remotes_var]" >> /etc/knot/knot.conf
       fi
       cd /var/lib/knot/kasp 
       keymgr zone add $zone policy rsa
