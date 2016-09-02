@@ -1,4 +1,4 @@
-@ IN SOA ns1.vx-labs.net. hostmaster (424878295 8640 360 60480 10 )
+@ IN SOA ns1.vx-labs.net. hostmaster (425878295 8640 360 60480 10 )
 @                 IN NS           ns1
 @                 IN NS           mary.nyuu.eu.
 @                 IN NS           pelargir.horgix.fr.
