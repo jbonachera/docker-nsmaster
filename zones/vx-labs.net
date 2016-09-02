@@ -23,4 +23,7 @@ ns2               IN A            62.210.169.201
 ts3               IN A            62.210.169.201
 ts                IN CNAME        ts3
 hooks             IN A            62.210.169.201
-cloud             IN A            62.210.169.201
+cloud             IN NS           ns-1126.awsdns-12.org.
+cloud             IN NS           ns-1756.awsdns-27.co.uk.
+cloud             IN NS           ns-937.awsdns-53.net.
+cloud             IN NS           ns-280.awsdns-35.com.
