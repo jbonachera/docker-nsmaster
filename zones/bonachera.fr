@@ -1,4 +1,4 @@
-@ IN SOA ns1.vx-labs.net. hostmaster (423878291 8640 360 60480 10 )
+@ IN SOA ns1.vx-labs.net. hostmaster (423878294 8640 360 60480 10 )
 @                  IN NS           ns1.bonachera.fr.
 @                  IN NS           ns2.bonachera.fr.
 @                  IN NS           mary.nyuu.eu.
