@@ -1,12 +1,10 @@
-@ IN SOA ns1.vx-labs.net. hostmaster (423878294 8640 360 60480 10 )
-@                  IN NS           ns1.bonachera.fr.
-@                  IN NS           ns2.bonachera.fr.
+@ IN SOA ns1.bonachera.fr. hostmaster (2016101704 8641 360 60480 10 )
+@                  IN NS           ns1
 @                  IN NS           mary.nyuu.eu.
 @                  IN NS           pelargir.horgix.fr.
 @                  IN A            62.210.169.201
 @                  IN MX      1    vx-labs.net.
 ns1                IN A            62.210.169.201
-ns2                IN A            62.210.169.201
 default._domainkey IN TXT          "v=DKIM1; k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDkQX6HGL8u4WvhCqG198aTWRQ+K9yxbuq+Si7sJOf5tDinbT8ZSBMAUpbKJl33p9IWBOzBOXeYRL3BdmAMdch6Jihv4QHLdYy8+akxPyHVSSATeXduzd2gESPMoJAgNUUrCHjvK6WYWfbRgPpoiFffBI6xYXH3ZjwIPVLO1cow3QIDAQAB"
 omail._domainkey   IN TXT          "v=DKIM1; k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDkQX6HGL8u4WvhCqG198aTWRQ+K9yxbuq+Si7sJOf5tDinbT8ZSBMAUpbKJl33p9IWBOzBOXeYRL3BdmAMdch6Jihv4QHLdYy8+akxPyHVSSATeXduzd2gESPMoJAgNUUrCHjvK6WYWfbRgPpoiFffBI6xYXH3ZjwIPVLO1cow3QIDAQAB"
 _dmark             IN TXT          "v=DMARC1; p=none; rua=mailauth-reports@bonachera.fr"  
