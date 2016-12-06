@@ -1,10 +1,11 @@
 #!/bin/bash
 # This is HELL. I need to make some cleanup ..
 
-#ZONES=${ZONES:-''}
-#ZONES_DNSSEC=${ZONES_DNSSEC:-''}
-#TSIG_KEYS=${TSIG_KEYS:-''}
-#TSIG_SLAVES=${TSIG_SLAVES:-''}
+ZONES=${ZONES:-''}
+ZONES_DNSSEC=${ZONES_DNSSEC:-''}
+TSIG_UPDATES=${TSIG_UPDATES:-''}
+TSIG_KEYS=${TSIG_KEYS:-''}
+TSIG_SLAVES=${TSIG_SLAVES:-''}
 
 [[ -d /var/lib/knot/zones/ ]] || mkdir /var/lib/knot/zones/
 if [ ! -e /.bootstraped ]; then

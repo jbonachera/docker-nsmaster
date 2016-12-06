@@ -17,7 +17,6 @@ template:
     storage: "/var/lib/knot"
     kasp-db: "kasp"
     disable-any: on
-{% if TSIG_KEYS %}
 key:
 {% for key_data in TSIG_KEYS.split(' ') %}
 {% set id, alg, secret =  key_data.split(':') %}
@@ -32,6 +31,13 @@ remote:
     address: {{ remote }}@53
 {% endfor %}
 acl:
+{% for updatekey_data in TSIG_UPDATES.split(' ') %}
+{% set id, remote, key_id = updatekey_data.split(':') %}
+  - id: acl_{{ id }}
+    address: {{ remote }}
+    key: key_{{ key_id }}
+    action: update
+{% endfor -%}
 {% for slave_data in TSIG_SLAVES.split(' ') %}
 {% set id, remote, key_id = slave_data.split(':') %}
   - id: acl_{{ id }}
@@ -39,7 +45,6 @@ acl:
     key: key_{{ key_id }}
     action: transfer
 {% endfor %}
-{% endif %}
 zone:
 {% for zone in ZONES_DNSSEC.split(' ') %}
   - domain: {{ zone }}
