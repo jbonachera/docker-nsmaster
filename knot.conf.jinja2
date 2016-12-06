@@ -1,0 +1,51 @@
+policy:
+  - id: rsa
+    algorithm: RSASHA256
+    ksk-size: 2048
+    zsk-size: 1024
+server:
+    listen: 0.0.0.0@53
+    listen: ::@53
+    user: knot:knot
+    rate-limit: 15
+    rate-limit-slip: 1
+log:
+  - target: stdout
+    any: info
+template:
+  - id: default
+    storage: "/var/lib/knot"
+    kasp-db: "kasp"
+    disable-any: on
+{% if TSIG_KEYS %}
+key:
+{% for key_data in TSIG_KEYS.split(' ') %}
+{% set id, alg, secret =  key_data.split(':') %}
+  - id: key_{{ id }}
+    algorithm: {{ alg }}
+    secret: {{ secret }}
+{% endfor %}
+remote:
+{% for slave_data in TSIG_SLAVES.split(' ') %}
+{% set id, remote, key_id = slave_data.split(':')  %}
+  - id: slave_{{ id }}
+    address: {{ remote }}@53
+{% endfor %}
+acl:
+{% for slave_data in TSIG_SLAVES.split(' ') %}
+{% set id, remote, key_id = slave_data.split(':') %}
+  - id: acl_{{ id }}
+    address: {{ remote }}
+    key: key_{{ key_id }}
+    action: transfer
+{% endfor %}
+{% endif %}
+zone:
+{% for zone in ZONES_DNSSEC.split(' ') %}
+  - domain: {{ zone }}
+    dnssec-signing: on
+    dnssec-policy: rsa
+    file: /var/lib/knot/zones/{{ zone }}
+    acl: [ {% for slave_data in TSIG_SLAVES.split(' ') %}acl_{{ slave_data.split(':')[0] }}{% if not loop.last %},{% endif %}{% endfor %} ]
+    notify: [ {% for slave_data in TSIG_SLAVES.split(' ') %}slave_{{ slave_data.split(':')[0] }}{% if not loop.last %},{% endif %}{% endfor %} ]
+{% endfor %}

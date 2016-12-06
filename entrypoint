@@ -1,77 +1,20 @@
 #!/bin/bash
 # This is HELL. I need to make some cleanup ..
 
-ZONES=${ZONES:-''}
-ZONES_DNSSEC=${ZONES_DNSSEC:-''}
-TSIG_KEYS=${TSIG_KEYS:-''}
-TSIG_SLAVES=${TSIG_SLAVES:-''}
+#ZONES=${ZONES:-''}
+#ZONES_DNSSEC=${ZONES_DNSSEC:-''}
+#TSIG_KEYS=${TSIG_KEYS:-''}
+#TSIG_SLAVES=${TSIG_SLAVES:-''}
 
 [[ -d /var/lib/knot/zones/ ]] || mkdir /var/lib/knot/zones/
-
 if [ ! -e /.bootstraped ]; then
-  if [ -n "${TSIG_KEYS}" ]; then
-    echo -e "key:\n" >> /etc/knot/knot.conf
-    for key in ${TSIG_KEYS}; do
-      key_id=$(echo $key | cut -d : -f 1)
-      key_alg=$(echo $key | cut -d : -f 2)
-      key_secret=$(echo $key | cut -d : -f 3)
-      echo "adding key $key_id"
-      echo -e "  - id: key_${key_id}\n    algorithm: ${key_alg}\n    secret: ${key_secret}" >> /etc/knot/knot.conf
-    done
-    echo -e "remote:\n" >> /etc/knot/knot.conf
-    for slave in ${TSIG_SLAVES}; do
-      slave_id=$(echo $slave | cut -d : -f 1)
-      slave_ip=$(echo $slave | cut -d : -f 2)
-      slave_keyid=$(echo $slave | cut -d : -f 3)
-      echo "adding remotes for slaves"
-      echo -e "  - id: slave_${slave_id}\n    address: ${slave_ip}@53" >> /etc/knot/knot.conf
-    done
-    echo -e "acl:\n" >> /etc/knot/knot.conf
-    for slave in ${TSIG_SLAVES}; do
-      slave_id=$(echo $slave | cut -d : -f 1)
-      slave_ip=$(echo $slave | cut -d : -f 2)
-      slave_keyid=$(echo $slave | cut -d : -f 3)
-      echo "adding acl for slaves"
-      echo -e "  - id: acl_${slave_id}\n    address: ${slave_ip}\n    key: key_${slave_keyid}\n    action: transfer" >> /etc/knot/knot.conf
-    done
-  fi
-  
-  echo -e "zone:\n" >> /etc/knot/knot.conf
-  for zone in ${ZONES}; do
-    echo "adding zone $zone"
+  render.py /etc/knot/knot.conf.jinja2 > /etc/knot/knot.conf
+  for zone in ${ZONES_DNSSEC}; do
+    echo "adding signed zone $zone"
     cp /etc/knot/zones/${zone} /var/lib/knot/zones/$zone
-    echo -e "  - domain: $zone\n    file: zones/$zone" >> /etc/knot/knot.conf
   done
-  
-  if [ -n "${ZONES_DNSSEC}" ]; then
-    mkdir -p /var/lib/knot/kasp
-    cd /var/lib/knot/kasp && keymgr init
-    keymgr policy add rsa algorithm RSASHA256 zsk-size 1024 ksk-size 2048
-    cd -
-    for zone in ${ZONES_DNSSEC}; do
-      echo "adding signed zone $zone"
-      cp /etc/knot/zones/${zone} /var/lib/knot/zones/$zone
-      echo -e "  - domain: $zone\n    dnssec-signing: on\n    file: /var/lib/knot/zones/$zone" >> /etc/knot/knot.conf
-      if [ -n "${TSIG_KEYS}" ]; then
-        slaves_var=''
-        remotes_var=''
-        for slave in ${TSIG_SLAVES}; do
-          slave_id=$(echo $slave | cut -d : -f 1)
-          slaves_var="${slaves_var} acl_${slave_id},"
-          remotes_var="${remotes_var} slave_${slave_id},"
-        done
-        slaves_var="${slaves_var%?}"
-        remotes_var="${remotes_var%?}"
-        echo -e "    acl: [$slaves_var]\n    notify: [$remotes_var]" >> /etc/knot/knot.conf
-      fi
-      cd /var/lib/knot/kasp 
-      keymgr zone add $zone policy rsa
-      cd -
-    done
-  fi
 fi
 touch /.bootstraped
-
 
 
 echo "config dump:"

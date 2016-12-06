@@ -1,4 +1,4 @@
-FROM pritunl/archlinux
+FROM jbonachera/arch
 MAINTAINER Julien BONACHERA <julien@bonachera.fr>
 
 ENTRYPOINT /sbin/entrypoint
@@ -20,6 +20,6 @@ RUN pacman -S --noconfirm git make gcc autoconf automake gnutls libcap-ng liburc
     useradd -r knot && \
     chown -R knot:knot /run/knot /var/lib/knot
 VOLUME /var/lib/knot/
-ADD knot.conf /etc/knot/knot.conf
+ADD knot.conf.jinja2 /etc/knot/knot.conf.jinja2
 ADD entrypoint /sbin/entrypoint
 ADD zones /etc/knot/zones
