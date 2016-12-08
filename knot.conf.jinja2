@@ -51,6 +51,6 @@ zone:
     dnssec-signing: on
     dnssec-policy: rsa
     file: /var/lib/knot/zones/{{ zone }}
-    acl: [ {% for slave_data in TSIG_SLAVES.split(' ') %}acl_{{ slave_data.split(':')[0] }}{% if not loop.last %},{% endif %}{% endfor %} ]
+    acl: [ {% for slave_data in TSIG_SLAVES.split(' ') + TSIG_UPDATES.split(' ')  %}acl_{{ slave_data.split(':')[0] }}{% if not loop.last %},{% endif %}{% endfor %} ]
     notify: [ {% for slave_data in TSIG_SLAVES.split(' ') %}slave_{{ slave_data.split(':')[0] }}{% if not loop.last %},{% endif %}{% endfor %} ]
 {% endfor %}
