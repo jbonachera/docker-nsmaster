@@ -8,16 +8,15 @@ TSIG_KEYS=${TSIG_KEYS:-''}
 TSIG_SLAVES=${TSIG_SLAVES:-''}
 
 [[ -d /var/lib/knot/zones/ ]] || mkdir /var/lib/knot/zones/
-if [ ! -e /.bootstraped ]; then
-  render.py /etc/knot/knot.conf.jinja2 > /etc/knot/knot.conf
-  for zone in ${ZONES_DNSSEC}; do
+render.py /etc/knot/knot.conf.jinja2 > /etc/knot/knot.conf
+for zone in ${ZONES_DNSSEC}; do
+  if [ ! -f /var/lib/knot/zones/$zone ]; then
     echo "adding signed zone $zone"
     cp /etc/knot/zones/${zone} /var/lib/knot/zones/$zone
-  done
-fi
-touch /.bootstraped
-
-
+  else
+    echo "$zone already exist."
+  fi
+done
 echo "config dump:"
 cat /etc/knot/knot.conf
 chown -R knot: /var/lib/knot 
