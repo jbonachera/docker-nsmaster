@@ -1,5 +1,4 @@
 #!/bin/bash
-# This is HELL. I need to make some cleanup ..
 
 ZONES=${ZONES:-''}
 ZONES_DNSSEC=${ZONES_DNSSEC:-''}
