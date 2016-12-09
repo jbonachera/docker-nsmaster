@@ -6,6 +6,7 @@ ZONES_DNSSEC=${ZONES_DNSSEC:-''}
 TSIG_UPDATES=${TSIG_UPDATES:-''}
 TSIG_KEYS=${TSIG_KEYS:-''}
 TSIG_SLAVES=${TSIG_SLAVES:-''}
+DNSTAP_SOCKET=${DNSTAP_SOCKET:-''}
 
 [[ -d /var/lib/knot/zones/ ]] || mkdir /var/lib/knot/zones/
 render.py /etc/knot/knot.conf.jinja2 > /etc/knot/knot.conf

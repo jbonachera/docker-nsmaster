@@ -1,3 +1,8 @@
+{% if DNSTAP_SOCKET %}
+mod-dnstap:
+  - id: capture_all
+    sink: unix:{{ DNSTAP_SOCKET }}
+{% endif %}
 policy:
   - id: rsa
     algorithm: RSASHA256
@@ -14,6 +19,9 @@ log:
     any: info
 template:
   - id: default
+{%- if DNSTAP_SOCKET %}
+    global-module: mod-dnstap/capture_all
+{%- endif %}
     storage: "/var/lib/knot"
     kasp-db: "kasp"
     disable-any: on
