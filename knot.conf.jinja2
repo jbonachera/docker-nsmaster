@@ -19,9 +19,9 @@ log:
     any: info
 template:
   - id: default
-{%- if DNSTAP_SOCKET %}
+{% if DNSTAP_SOCKET %}
     global-module: mod-dnstap/capture_all
-{%- endif %}
+{% endif %}
     storage: "/var/lib/knot"
     kasp-db: "kasp"
     disable-any: on
