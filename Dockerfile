@@ -2,6 +2,7 @@ FROM jbonachera/arch
 MAINTAINER Julien BONACHERA <julien@bonachera.fr>
 
 ENTRYPOINT /sbin/entrypoint
+HEALTHCHECK --interval=10s --timeout=3s CMD knotc status || exit 1
 EXPOSE 53/udp
 EXPOSE 53/tcp
 
