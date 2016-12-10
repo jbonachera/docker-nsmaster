@@ -12,7 +12,14 @@ render.py /etc/knot/knot.conf.jinja2 > /etc/knot/knot.conf || exit 1
 for zone in ${ZONES_DNSSEC}; do
   if [ ! -f /var/lib/knot/zones/$zone ]; then
     echo "adding signed zone $zone"
-    cp /etc/knot/zones/${zone} /var/lib/knot/zones/$zone
+    if [ -f /etc/knot/zones/${zone} ]; then
+      cp /etc/knot/zones/${zone} /var/lib/knot/zones/$zone
+    else
+      cat << EOF >/var/lib/knot/zones/$zone
+@ IN SOA ns1.$zone. hostmaster (2016101906 8641 360 60480 10 )
+@                  IN NS           ns1
+EOF
+    fi
   else
     echo "$zone already exist."
   fi
