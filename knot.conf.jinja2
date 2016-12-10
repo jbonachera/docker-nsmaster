@@ -1,3 +1,4 @@
+{% if TSIG_SLAVES %}
 {% set remotes = [] %}
 {% for slave_data in TSIG_SLAVES.split(' ') %}
 {% set ip_addr = slave_data.split(':')[1] %}
@@ -5,6 +6,7 @@
     {% set remotes = remotes + [ip_addr] %}
 {% endif %}
 {% endfor %}
+{% endif %}
 
 {% if DNSTAP_SOCKET %}
 mod-dnstap:
@@ -34,6 +36,7 @@ template:
     serial-policy: {{ SERIAL_POLICY | default("increment")}}
     kasp-db: "kasp"
     disable-any: on
+{% if TSIG_KEYS %}
 key:
 {% for key_data in TSIG_KEYS.split(' ') %}
 {% set id, alg, secret =  key_data.split(':') %}
@@ -41,6 +44,8 @@ key:
     algorithm: {{ alg }}
     secret: {{ secret }}
 {% endfor %}
+{% endif %}
+{% if TSIG_SLAVES %}
 remote:
 {% for slave_data in TSIG_SLAVES.split(' ') %}
 {% set id, remote, key_id = slave_data.split(':')  %}
@@ -49,7 +54,10 @@ remote:
     address: {{ remote }}@53
 {% endif %}
 {% endfor %}
+{% endif %}
+{% if TSIG_UPDATES or TSIG_SLAVES %}
 acl:
+{% if TSIG_UPDATES %}
 {% for updatekey_data in TSIG_UPDATES.split(' ') %}
 {% set id, remote, key_id = updatekey_data.split(':') %}
   - id: acl_{{ id }}
@@ -57,6 +65,8 @@ acl:
     key: key_{{ key_id }}
     action: update
 {% endfor -%}
+{% endif %}
+{% if TSIG_SLAVES %}
 {% for slave_data in TSIG_SLAVES.split(' ') %}
 {% set id, remote, key_id = slave_data.split(':') %}
   - id: acl_{{ id }}
@@ -64,13 +74,17 @@ acl:
     key: key_{{ key_id }}
     action: transfer
 {% endfor %}
+{% endif %}
+{% endif %}
 zone:
 {% for zone in ZONES_DNSSEC.split(' ') %}
   - domain: {{ zone }}
     dnssec-signing: on
     dnssec-policy: rsa
     file: /var/lib/knot/zones/{{ zone }}
+{% if TSIG_SLAVES or TSIG_UPDATES  %}
     acl: [ {% for slave_data in TSIG_SLAVES.split(' ') + TSIG_UPDATES.split(' ')  %}acl_{{ slave_data.split(':')[0] }}{% if not loop.last %},{% endif %}{% endfor %} ]
+{% endif %}
 {% if remotes | length  %}
     notify: [ {{ remotes | join(',') }}]
 {% endif %}
