@@ -1,10 +1,20 @@
-{% if TSIG_SLAVES %}
+{% set acls = [] %}
 {% set remotes = [] %}
+
+{% if TSIG_SLAVES %}
 {% for slave_data in TSIG_SLAVES.split(' ') %}
-{% set ip_addr = slave_data.split(':')[1] %}
+{% set id, ip_addr, key = slave_data.split(':') %}
 {% if "/" not in ip_addr %}
     {% set remotes = remotes + [ip_addr] %}
+    {% if remotes.append(ip_addr) %}{% endif %}
 {% endif %}
+{% if acls.append("acl_"+id) %}{% endif %}
+{% endfor %}
+{% endif %}
+{% if TSIG_UPDATES %}
+{% for update_data in TSIG_UPDATES.split(' ') %}
+{% set id, ip_addr, key = update_data.split(':') %}
+{% if acls.append("acl_"+id) %}{% endif %}
 {% endfor %}
 {% endif %}
 
@@ -82,8 +92,8 @@ zone:
     dnssec-signing: on
     dnssec-policy: rsa
     file: /var/lib/knot/zones/{{ zone }}
-{% if TSIG_SLAVES or TSIG_UPDATES  %}
-    acl: [ {% for slave_data in TSIG_SLAVES.split(' ') + TSIG_UPDATES.split(' ')  %}acl_{{ slave_data.split(':')[0] }}{% if not loop.last %},{% endif %}{% endfor %} ]
+{% if acls | length  %}
+    acl: [ {{ acls | join (',') }}]
 {% endif %}
 {% if remotes | length  %}
     notify: [ {{ remotes | join(',') }}]
