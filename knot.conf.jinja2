@@ -1,3 +1,11 @@
+{% set remotes = [] %}
+{% for slave_data in TSIG_SLAVES.split(' ') %}
+{% set ip_addr = slave_data.split(':')[1] %}
+{% if "/" not in ip_addr %}
+    {% set remotes = remotes + [ip_addr] %}
+{% endif %}
+{% endfor %}
+
 {% if DNSTAP_SOCKET %}
 mod-dnstap:
   - id: capture_all
@@ -23,6 +31,7 @@ template:
     global-module: mod-dnstap/capture_all
 {% endif %}
     storage: "/var/lib/knot"
+    serial-policy: {{ SERIAL_POLICY | default("increment")}}
     kasp-db: "kasp"
     disable-any: on
 key:
@@ -35,8 +44,10 @@ key:
 remote:
 {% for slave_data in TSIG_SLAVES.split(' ') %}
 {% set id, remote, key_id = slave_data.split(':')  %}
+{% if "/" not in remote %}
   - id: slave_{{ id }}
     address: {{ remote }}@53
+{% endif %}
 {% endfor %}
 acl:
 {% for updatekey_data in TSIG_UPDATES.split(' ') %}
@@ -60,5 +71,7 @@ zone:
     dnssec-policy: rsa
     file: /var/lib/knot/zones/{{ zone }}
     acl: [ {% for slave_data in TSIG_SLAVES.split(' ') + TSIG_UPDATES.split(' ')  %}acl_{{ slave_data.split(':')[0] }}{% if not loop.last %},{% endif %}{% endfor %} ]
-    notify: [ {% for slave_data in TSIG_SLAVES.split(' ') %}slave_{{ slave_data.split(':')[0] }}{% if not loop.last %},{% endif %}{% endfor %} ]
+{% if remotes | length  %}
+    notify: [ {{ remotes | join(',') }}]
+{% endif %}
 {% endfor %}
