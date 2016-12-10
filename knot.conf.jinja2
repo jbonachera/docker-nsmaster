@@ -36,7 +36,9 @@ server:
     rate-limit-slip: 1
 log:
   - target: stdout
-    any: info
+    any: notice
+    zone: info
+    server: info
 template:
   - id: default
 {% if DNSTAP_SOCKET %}
